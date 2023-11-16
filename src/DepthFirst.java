@@ -16,7 +16,6 @@ public class DepthFirst {
 
             int dx = -1;
             int dy = 0;
-
             if (searchPath(maze, x + dx, y + dy, path)){
                 path.add(x);
                 path.add(y);
@@ -25,7 +24,6 @@ public class DepthFirst {
 
             dx = 1;
             dy = 0;
-
             if (searchPath(maze, x + dx, y + dy, path)){
                 path.add(x);
                 path.add(y);
@@ -34,7 +32,6 @@ public class DepthFirst {
 
             dx = 0;
             dy = -1;
-
             if (searchPath(maze, x + dx, y + dy, path)){
                 path.add(x);
                 path.add(y);
@@ -43,7 +40,6 @@ public class DepthFirst {
 
             dx = 0;
             dy = 1;
-
             if (searchPath(maze, x + dx, y + dy, path)){
                 path.add(x);
                 path.add(y);
@@ -51,7 +47,6 @@ public class DepthFirst {
             }
 
         }
-
         return false;
     }
 }
