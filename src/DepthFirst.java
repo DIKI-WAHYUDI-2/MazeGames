@@ -1,12 +1,13 @@
 import java.util.List;
+import java.util.Stack;
 
 public class DepthFirst {
 
-    public static boolean searchPath(int[][] maze, int x, int y, List<Integer> path){
+    public static boolean searchPath(int[][] maze, int x, int y, Stack<Integer> path){
 
         if (maze[y][x] == 9){
-            path.add(x);
-            path.add(y);
+            path.push(x);
+            path.push(y);
             return true;
         }
 
@@ -17,32 +18,32 @@ public class DepthFirst {
             int dx = -1;
             int dy = 0;
             if (searchPath(maze, x + dx, y + dy, path)){
-                path.add(x);
-                path.add(y);
+                path.push(x);
+                path.push(y);
                 return true;
             }
 
             dx = 1;
             dy = 0;
             if (searchPath(maze, x + dx, y + dy, path)){
-                path.add(x);
-                path.add(y);
+                path.push(x);
+                path.push(y);
                 return true;
             }
 
             dx = 0;
             dy = -1;
             if (searchPath(maze, x + dx, y + dy, path)){
-                path.add(x);
-                path.add(y);
+                path.push(x);
+                path.push(y);
                 return true;
             }
 
             dx = 0;
             dy = 1;
             if (searchPath(maze, x + dx, y + dy, path)){
-                path.add(x);
-                path.add(y);
+                path.push(x);
+                path.push(y);
                 return true;
             }
 

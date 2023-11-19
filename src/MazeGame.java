@@ -1,125 +1,101 @@
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import javax.swing.*;
+public class MazeGame extends JFrame {
+    private static final int ROWS = 10;
+    private static final int COLS = 13;
+    private JButton[][] buttons;
+    private boolean[][] visited;
+    private int[][] maze = {
+            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+            {1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1},
+            {1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+            {1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1},
+            {1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1},
+            {1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1},
+            {1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1},
+            {1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 1}, // Changed exit to 9
+            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+    };
+    private int delay = 200;
 
-public class MazeGame extends JPanel {
-    private int playerX, playerY;  // Posisi pemain
-    private static final int PLAYER_SIZE = 20;
-    private int[][] maze;  // Labirin
+    public MazeGame() {
+        super("Maze Game");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(600, 600);
 
-    public MazeGame(int[][] maze) {
-        this.maze = maze;
+        initializeMaze();
+        createGUI();
 
-        // Cari posisi awal pemain
-        findPlayerStartPosition();
+        setVisible(true);
 
-        // Tambahkan KeyListener ke JPanel
+        solveMaze(1, 0); // Start DFS automatically
+
+        // Add key listener for space key
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                handleKeyPress(e);
+                if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                    solveMaze(1, 0);
+                }
             }
         });
         setFocusable(true);
     }
 
-    private void findPlayerStartPosition() {
-        for (int i = 0; i < maze.length; i++) {
-            for (int j = 0; j < maze[i].length; j++) {
-                if (maze[i][j] == 0) {
-                    playerX = j * PLAYER_SIZE;
-                    playerY = i * PLAYER_SIZE;
-                    return;
-                }
+    private void initializeMaze() {
+        buttons = new JButton[ROWS][COLS];
+        visited = new boolean[ROWS][COLS];
+
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
+                buttons[i][j] = new JButton();
+                buttons[i][j].setBackground(maze[i][j] == 1 ? Color.BLACK : Color.WHITE);
+                visited[i][j] = false;
+            }
+        }
+
+        // Set entrance
+        buttons[1][0].setBackground(Color.GREEN);
+    }
+
+    private void createGUI() {
+        setLayout(new GridLayout(ROWS, COLS));
+
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
+                add(buttons[i][j]);
             }
         }
     }
 
-    private void handleKeyPress(KeyEvent e) {
-        int keyCode = e.getKeyCode();
-        int moveAmount = PLAYER_SIZE;
-
-        int newPlayerX = playerX;
-        int newPlayerY = playerY;
-
-        switch (keyCode) {
-            case KeyEvent.VK_UP:
-                newPlayerY -= moveAmount;
-                break;
-            case KeyEvent.VK_DOWN:
-                newPlayerY += moveAmount;
-                break;
-            case KeyEvent.VK_LEFT:
-                newPlayerX -= moveAmount;
-                break;
-            case KeyEvent.VK_RIGHT:
-                newPlayerX += moveAmount;
-                break;
+    private void solveMaze(int row, int col) {
+        if (row < 0 || col < 0 || row >= ROWS || col >= COLS || visited[row][col] || maze[row][col] == 1) {
+            return;
         }
 
-        // Cek apakah langkah tersebut valid
-        if (isValidMove(newPlayerX, newPlayerY)) {
-            playerX = newPlayerX;
-            playerY = newPlayerY;
-        }
+        visited[row][col] = true;
+        buttons[row][col].setBackground(Color.CYAN); // DFS visualization effect
 
-        // Panggil repaint() untuk memperbarui tampilan
-        repaint();
-    }
-
-    private boolean isValidMove(int x, int y) {
-        // Cek apakah posisi baru di dalam batas labirin dan tidak bertabrakan dengan tembok
-        return x >= 0 && x < getWidth() && y >= 0 && y < getHeight() &&
-                maze[y / PLAYER_SIZE][x / PLAYER_SIZE] != 1;
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        // Gambar labirin
-        for (int i = 0; i < maze.length; i++) {
-            for (int j = 0; j < maze[i].length; j++) {
-                if (maze[i][j] == 1) {
-                    // Gambar tembok
-                    g.setColor(Color.BLACK);
-                    g.fillRect(j * PLAYER_SIZE, i * PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE);
-                } else if (maze[i][j] == 9) {
-                    // Gambar tujuan
-                    g.setColor(Color.RED);
-                    g.fillRect(j * PLAYER_SIZE, i * PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE);
-                }
+        Timer timer = new Timer(delay, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                solveMaze(row + 1, col); // Move down
+                solveMaze(row - 1, col); // Move up
+                solveMaze(row, col + 1); // Move right
+                solveMaze(row, col - 1); // Move left
             }
-        }
-
-        // Gambar pemain
-        g.setColor(Color.BLUE);
-        g.fillRect(playerX, playerY, PLAYER_SIZE, PLAYER_SIZE);
+        });
+        timer.setRepeats(false);
+        timer.start();
     }
 
     public static void main(String[] args) {
-        int[][] maze = {
-                {1,1,1,1,1,1,1,1,1,1,1,1,1},
-                {1,0,1,0,1,0,1,0,0,0,0,0,1},
-                {1,0,1,0,0,0,1,0,1,1,1,0,1},
-                {1,0,0,0,1,1,1,0,0,0,0,0,1},
-                {1,0,1,0,0,0,0,0,1,1,1,0,1},
-                {1,0,1,0,1,1,1,0,1,0,0,0,1},
-                {1,0,1,0,1,0,0,0,1,1,1,0,1},
-                {1,0,1,0,1,1,1,0,1,0,1,0,1},
-                {1,0,0,0,0,0,0,0,0,0,1,9,1},
-                {1,1,1,1,1,1,1,1,1,1,1,1,1}
-        };
-
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Maze Game");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(maze[0].length * PLAYER_SIZE, maze.length * PLAYER_SIZE);
-            frame.add(new MazeGame(maze));
-            frame.setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new MazeGame());
     }
 }
-
