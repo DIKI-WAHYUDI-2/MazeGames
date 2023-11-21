@@ -6,29 +6,21 @@ public class MazeSolve extends JFrame {
 
     private static int[][] maze = {
 
-        {1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {1,0,1,0,1,0,1,0,0,0,0,0,1},
-        {1,0,1,0,0,0,1,0,1,1,1,0,1},
-        {1,0,0,0,1,1,1,0,0,0,0,0,1},
-        {1,0,1,0,0,0,0,0,1,1,1,0,1},
-        {1,0,1,0,1,1,1,0,1,0,0,0,1},
-        {1,0,1,0,1,0,0,0,1,1,1,0,1},
-        {1,0,1,0,1,1,1,0,1,0,1,0,1},
-        {1,0,0,0,0,0,0,0,0,0,1,9,1},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1}
+            {1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,1,0,1,0,1,0,0,0,0,0,1},
+            {1,0,1,0,0,0,1,0,1,1,1,0,1},
+            {1,0,0,0,1,1,1,0,0,0,0,0,1},
+            {1,0,1,0,0,0,0,0,1,1,1,0,1},
+            {1,0,1,0,1,1,1,0,1,0,0,0,1},
+            {1,0,1,0,1,0,0,0,1,1,1,0,1},
+            {1,0,1,0,1,1,1,0,1,0,1,0,1},
+            {1,0,0,0,0,0,0,0,0,0,1,9,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1}
 
     };
 
     private static Stack<int[]> pathStack = new Stack<>();
 
-    public MazeSolve(){
-        setTitle("Maze");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(640, 480);
-        setLocationRelativeTo(null);
-
-        depthFirstSearch(maze,1,1);
-    }
 
     private static void print(int[][] maze){
         for (int i = 0; i < maze.length; i++) {
@@ -82,15 +74,6 @@ public class MazeSolve extends JFrame {
         return false;
     }
 
-    private static void markShortestPath() {
-        // Tandai jalur terpendek dengan warna lain (misalnya, hijau)
-        for (int[] step : pathStack) {
-            if (maze[step[0]][step[1]] == 2) {
-                maze[step[0]][step[1]] = 3; // Ganti nilai 2 menjadi 3
-            }
-        }
-    }
-
     private static void printPath() {
         System.out.println("Solution Path:");
         for (int[] step : pathStack) {
@@ -133,14 +116,20 @@ public class MazeSolve extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
+    public void runAnimation() {
+        new Thread(() -> {
+            depthFirstSearch(maze, 1, 1);
+            print(maze);
+        }).start();
+    }
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MazeSolve main = new MazeSolve();
-                main.setVisible(main.rootPaneCheckingEnabled);
-            }
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            MazeSolve mazeSolve = new MazeSolve();
+            mazeSolve.setSize(800, 600);
+            mazeSolve.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            mazeSolve.setVisible(true);
+            mazeSolve.runAnimation();
         });
     }
 
