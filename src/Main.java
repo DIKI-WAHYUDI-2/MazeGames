@@ -30,7 +30,7 @@ public class Main extends JFrame {
         setSize(640, 480);
         setLocationRelativeTo(null);
 
-        DepthFirst.searchPath(maze,1,1, path);
+        //DepthFirst.searchPath(maze,1,1, path);
         pathIndex = path.size() - 2;
     }
 
