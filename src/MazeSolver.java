@@ -1,11 +1,12 @@
-public class DepthFirstSearch {
-
+public class MazeSolver {
     private char[][] maze;
     private boolean[][] visited;
+    private MazeSolverPanel mazeSolverPanel;
 
-    public DepthFirstSearch(char[][] maze) {
+    public MazeSolver(char[][] maze, MazeSolverPanel mazeSolverPanel) {
         this.maze = maze;
         this.visited = new boolean[maze.length][maze[0].length];
+        this.mazeSolverPanel = mazeSolverPanel;
     }
 
     public boolean solveMaze() {
@@ -13,7 +14,10 @@ public class DepthFirstSearch {
     }
 
     private boolean isValidSpot(int r, int c) {
-        return r >= 0 && r < maze.length && c >= 0 && c < maze[0].length && maze[r][c] == '.';
+        if (r >= 0 && r < maze.length && c >= 0 && c < maze[0].length) {
+            return maze[r][c] == '.';
+        }
+        return false;
     }
 
     private boolean depthFirstSearch(int r, int c) {
@@ -26,32 +30,39 @@ public class DepthFirstSearch {
             }
 
             maze[r][c] = '*';
-            // (Optional) Add repaint and sleep here if needed
+            mazeSolverPanel.repaint();
+            sleep();
 
-            // Up
             if (depthFirstSearch(r - 1, c)) {
                 return true;
             }
 
-            // Right
             if (depthFirstSearch(r, c + 1)) {
                 return true;
             }
 
-            // Down
             if (depthFirstSearch(r + 1, c)) {
                 return true;
             }
 
-            // Left
             if (depthFirstSearch(r, c - 1)) {
                 return true;
             }
 
-            maze[r][c] = ' '; // Backtrack
+            maze[r][c] = ' ';
             visited[r][c] = false;
-            // (Optional) Add repaint and sleep here if needed
+            mazeSolverPanel.repaint();
+            sleep();
         }
         return false;
+    }
+
+
+    private void sleep() {
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
